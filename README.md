@@ -1,0 +1,1 @@
+cargo +mos build --release
