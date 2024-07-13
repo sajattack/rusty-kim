@@ -1,8 +1,8 @@
 [build]
-target = "./mos-kim1-none.json"
+target = "mos-unknown-none"
 
-[target.mos-kim1-none]
-rustflags = ["-Clink-arg=-Tlink.ld"]
+[target.mos-unknown-none]
+rustflags = ["-Clink-arg=-Tldscripts/link.ld"]
 
 [unstable]
 build-std = ["core"]

@@ -3,8 +3,6 @@
 #![allow(unused_imports)]
 
 use ufmt_stdio::*;
-use core::panic::PanicInfo;
-use core::convert::Infallible;
 
 //#[panic_handler]
 //fn panic(_: &PanicInfo) -> ! {
@@ -15,8 +13,6 @@ use core::convert::Infallible;
     //}
     //loop {}
 //}
-
-use panic_halt as _;
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {

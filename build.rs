@@ -1,10 +1,7 @@
-use cc;
-
 fn main() {
     cc::Build::new()
-        .compiler("mos-kim1-clang")
+        .compiler("mos-clang")
         .include("/usr/local/mos-platform/common/include/")
-        .include("/usr/local/mos-platform/common/kim1/include/")
         .file("kim.c")
         .compile("kim");
     println!("cargo:rerun-if-changed=kim.c");
