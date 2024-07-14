@@ -14,6 +14,8 @@ use ufmt_stdio::*;
     //loop {}
 //}
 
+use panic_halt as _;
+
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
