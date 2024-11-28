@@ -1,3 +1,3 @@
-INCLUDE zp-data.ld
-INCLUDE zp-bss.ld
-INCLUDE zp-noinit.ld
+INCLUDE ldscripts/zp-data.ld
+INCLUDE ldscripts/zp-bss.ld
+INCLUDE ldscripts/zp-noinit.ld

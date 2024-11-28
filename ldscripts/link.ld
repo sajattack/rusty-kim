@@ -13,13 +13,13 @@ MEMORY {
 }
 
 __rc0 = 0xe0;
-INCLUDE imag-regs.ld
+INCLUDE ldscripts/imag-regs.ld
 ASSERT(__rc31 == 0xff, "Inconsistent zero page map.")
 
 
 
 SECTIONS {
-    INCLUDE c.ld
+    INCLUDE ldscripts/c.ld
 }
 
 

@@ -1,1 +1,1 @@
-.text : { INCLUDE text-sections.ld } >c_readonly
+.text : { INCLUDE ldscripts/text-sections.ld } >c_readonly

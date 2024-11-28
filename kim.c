@@ -2,10 +2,10 @@
 
 void scandisplay2(unsigned char a, unsigned char b, unsigned char c) {
     asm volatile(
-       "st%0     $FB\n"
-       "st%1     $FA\n"
-       "st%2     $F9\n"
-       "jmp      $1F1F" // SCANDS kernal fn
+       "st%0     0xFB\n"
+       "st%1     0xFA\n"
+       "st%2     0xF9\n"
+       "jmp      0x1F1F" //; SCANDS kernal fn
         : 
         : "R"(a), "R"(b), "R"(c)
         : "memory"
@@ -15,8 +15,8 @@ void scandisplay2(unsigned char a, unsigned char b, unsigned char c) {
 char getkey() {
     char out;
     asm volatile(
-        "jsr $1F40\n" // KEYIN
-        "jsr $1F6A" // GETKEY
+        "JSR 0x1F40\n" //; KEYIN
+        "JSR 0x1F6A\n" //; GETKEY
         : "=a" (out)
         :
         :
@@ -26,7 +26,7 @@ char getkey() {
 
 void __chrout(char c) {
     asm volatile(
-        "jsr $1EA0"
+        "JSR 0x1EA0"
         :
         :"a"(c)
         : 
@@ -36,7 +36,7 @@ void __chrout(char c) {
 char __chrin2() {
     char out;
     asm volatile(
-        "jsr $1E5A\n" // GETCHR
+        "JSR 0x1E5A" // GETCHR
         :"=a" (out)
         :
         : 

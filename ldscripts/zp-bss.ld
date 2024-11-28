@@ -1,2 +1,2 @@
-.zp.bss (NOLOAD) : { INCLUDE zp-bss-sections.ld } >zp
-INCLUDE zp-bss-symbols.ld
+.zp.bss (NOLOAD) : { INCLUDE ldscripts/zp-bss-sections.ld } >zp
+INCLUDE ldscripts/zp-bss-symbols.ld

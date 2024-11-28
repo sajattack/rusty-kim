@@ -1,8 +1,8 @@
 [build]
-target = "./mos-sim-none.json"
-
-[target.mos-sim-none]
-rustflags = ["-Clink-arg=-Tldscripts/link.ld"]
+target = "mos-unknown-none"
+rustflags = [
+    "-C", "link-arg=-Tldscripts/link.ld",
+]
 
 [unstable]
 build-std = ["core", "compiler_builtins"]

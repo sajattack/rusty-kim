@@ -1,1 +1,1 @@
-.zp (NOLOAD) : { INCLUDE zp-noinit-sections.ld } >zp
+.zp (NOLOAD) : { INCLUDE ldscripts/zp-noinit-sections.ld } >zp

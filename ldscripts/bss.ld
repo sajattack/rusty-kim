@@ -1,2 +1,2 @@
-.bss (NOLOAD) : { INCLUDE bss-sections.ld } >c_writeable
-INCLUDE bss-symbols.ld
+.bss (NOLOAD) : { INCLUDE ldscripts/bss-sections.ld } >c_writeable
+INCLUDE ldscripts/bss-symbols.ld

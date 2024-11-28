@@ -1,1 +1,1 @@
-.noinit (NOLOAD) : { INCLUDE noinit-sections.ld } >c_writeable
+.noinit (NOLOAD) : { INCLUDE ldscripts/noinit-sections.ld } >c_writeable
