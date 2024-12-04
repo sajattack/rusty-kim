@@ -33,5 +33,5 @@ cc = "1.0.83"
 
 [[bin]]
 name = "rusty-kim"
-filename="rusty-kim.bin"
+#filename="rusty-kim.bin"
 
