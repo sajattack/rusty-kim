@@ -1,14 +1,28 @@
+#include <stdint.h>
 #include <stdio.h>
 
-void scandisplay2(unsigned char a, unsigned char b, unsigned char c) {
+void scandisplay(unsigned char a, unsigned char b, unsigned char c) {
     asm volatile(
-       "st%0     0xFB\n"
-       "st%1     0xFA\n"
-       "st%2     0xF9\n"
-       "jmp      0x1F1F" //; SCANDS kernal fn
+       "ST%0     0xFB\n"
+       "ST%1     0xFA\n"
+       "ST%2     0xF9\n"
+       "JMP      0x1F1F" //; SCANDS kernal fn
         : 
         : "R"(a), "R"(b), "R"(c)
         : "memory"
+    );
+}
+
+void cleardisplay()
+{
+    *((uint8_t*)0x1742) = 0;
+}
+
+void nop() {
+    asm volatile(
+        "nop\n" //; KEYIN
+        :
+        :
     );
 }
 
@@ -66,4 +80,3 @@ int getchar(void) {
     c = __chrin();
     return c;
 }
-
