@@ -26,12 +26,17 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     unsafe { scandisplay(result_addr[1], result_addr[0], 3); }
     delay();
 
+    unsafe { TOTAL = 0; }
+    unsafe { INPUT_BUFFER [0] = 0; }
+    unsafe { INPUT_BUFFER [1] = 0; }
+    unsafe { brk() };
     0
 }
 
 extern "C" {
     fn scandisplay(a: u8, b: u8, c: u8);
     fn nop();
+    fn brk();
 } 
 
 static mut INPUT_BUFFER: [u32; 2] = [0u32; 2];
@@ -44,11 +49,8 @@ extern fn process_input_pair() {
 
 #[inline(never)]
 fn delay() {
-    for _ in 0..u16::MAX {
-        core::hint::spin_loop();
-        for _ in 0..255 {
+    for _ in 0..u8::MAX {
             core::hint::spin_loop();
             unsafe { nop() };
-        }
     }
 }

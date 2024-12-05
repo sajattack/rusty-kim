@@ -2,7 +2,7 @@
 
 MEMORY {
     zp (rw): ORIGIN = 0x0020, LENGTH = 0x80
-    stack(rw): ORIGIN = 0x100, LENGTH = 0x100
+    stack(rw): ORIGIN = 0x100, LENGTH = 0xff
     ram (rw) : ORIGIN = 0x0200, LENGTH = 1024 - 0x200
 }
 

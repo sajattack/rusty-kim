@@ -26,6 +26,15 @@ void nop() {
     );
 }
 
+void brk() {
+    asm volatile(
+        "brk\n" //; KEYIN
+        :
+        :
+    );
+
+}
+
 char getkey() {
     char out;
     asm volatile(
