@@ -18,30 +18,32 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // Doesn't fit
     //let display_result_addr = (display_result as *const () as u16).to_be_bytes();
     
-    unsafe { scandisplay(data_addr [0], data_addr[1], 1); }
-    delay();
+    unsafe {
+        scandisplay(data_addr [0], data_addr[1], 1); 
+        delay();
     
-    unsafe { scandisplay(sub_addr[0], sub_addr[1], 2); }
-    delay();
+        scandisplay(sub_addr[0], sub_addr[1], 2); 
+        delay();
     
-    unsafe { scandisplay(result_addr[0], result_addr[1], 3); }
-    delay();
+        scandisplay(result_addr[0], result_addr[1], 3); 
+        delay();
 
-    // Doesn't fit
-    //unsafe { scandisplay(display_result_addr[0], display_result_addr[1], 4); }
-    //delay();
+
+        // Doesn't fit
+        //scandisplay(display_result_addr[0], display_result_addr[1], 4); }
+        //delay();
+    }
+
 
     unsafe { TOTAL = 0; }
     unsafe { INPUT_BUFFER [0] = 0; }
     unsafe { INPUT_BUFFER [1] = 0; }
-    unsafe { brk() };
     0
 }
 
 extern "C" {
     fn scandisplay(a: u8, b: u8, c: u8);
-    fn nop();
-    fn brk();
+    fn delay();
 } 
 
 #[link_section=".zp.bss"]
@@ -65,11 +67,3 @@ extern fn process_input_pair() {
         //delay();
     //}
 //}
-
-#[inline(never)]
-fn delay() {
-    for _ in 0..1024u16 {
-            core::hint::spin_loop();
-            unsafe { nop() };
-    }
-}

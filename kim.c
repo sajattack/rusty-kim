@@ -20,7 +20,7 @@ void cleardisplay()
 
 void nop() {
     asm volatile(
-        "nop\n" //; KEYIN
+        "nop\n"
         :
         :
     );
@@ -28,9 +28,25 @@ void nop() {
 
 void brk() {
     asm volatile(
-        "brk\n" //; KEYIN
+        "brk\n"
         :
         :
+    );
+
+}
+
+void delay() {
+    asm volatile(
+        "ldy #$10\n"
+        "loop1: ldx #$ff\n"
+        "loop2: nop\n"
+        "dex\n"
+        "bne loop2\n"
+        "dey\n"
+        "bne loop1\n"
+        :
+        :
+        :"x", "y"
     );
 
 }
