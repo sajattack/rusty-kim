@@ -12,19 +12,24 @@ fn panic(_info: &PanicInfo) -> ! {
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+    let data_addr = ( unsafe {addr_of_mut!(INPUT_BUFFER)}  as *const _ as u16).to_be_bytes();
+    let sub_addr = (process_input_pair as *const () as u16).to_be_bytes();
+    let result_addr = (unsafe {addr_of_mut!(TOTAL)} as *const _ as u16).to_be_bytes();
+    // Doesn't fit
+    //let display_result_addr = (display_result as *const () as u16).to_be_bytes();
+    
+    unsafe { scandisplay(data_addr [0], data_addr[1], 1); }
+    delay();
+    
+    unsafe { scandisplay(sub_addr[0], sub_addr[1], 2); }
+    delay();
+    
+    unsafe { scandisplay(result_addr[0], result_addr[1], 3); }
+    delay();
 
-    let data_addr = unsafe { core::mem::transmute::<u16, [u8;2]>({ addr_of_mut!(INPUT_BUFFER) }  as *const _ as u16) };
-    let sub_addr = unsafe { core::mem::transmute::<u16, [u8;2]>(process_input_pair as *const () as u16) };
-    let result_addr = unsafe { core::mem::transmute::<u16, [u8;2]>( addr_of_mut!( TOTAL ) as *const _ as u16)};
-    
-    unsafe { scandisplay(data_addr [1], data_addr[0], 1); }
-    delay();
-    
-    unsafe { scandisplay(sub_addr[1], sub_addr[0], 2); }
-    delay();
-    
-    unsafe { scandisplay(result_addr[1], result_addr[0], 3); }
-    delay();
+    // Doesn't fit
+    //unsafe { scandisplay(display_result_addr[0], display_result_addr[1], 4); }
+    //delay();
 
     unsafe { TOTAL = 0; }
     unsafe { INPUT_BUFFER [0] = 0; }
@@ -39,17 +44,31 @@ extern "C" {
     fn brk();
 } 
 
+#[link_section=".zp.bss"]
 static mut INPUT_BUFFER: [u32; 2] = [0u32; 2];
+#[link_section=".zp.bss"]
 static mut TOTAL: u64 = 0;
 
 #[inline(never)]
 extern fn process_input_pair() {
-   unsafe { TOTAL += INPUT_BUFFER[0].abs_diff(INPUT_BUFFER[1]) as u64 }; 
+   unsafe { TOTAL += u32::from_be(INPUT_BUFFER[0]).abs_diff(u32::from_be(INPUT_BUFFER[1])) as u64 }; 
 }
+
+// Doesn't fit
+//#[inline(never)]
+//extern fn display_result() {
+    //let result_bytes = unsafe { TOTAL }.to_be_bytes();
+    ////for (i, word) in result_bytes.windows(2).enumerate()
+    //for i in 0..4
+    //{
+        //unsafe { scandisplay(result_bytes[i], result_bytes[i+1], i as u8) };
+        //delay();
+    //}
+//}
 
 #[inline(never)]
 fn delay() {
-    for _ in 0..u8::MAX {
+    for _ in 0..1024u16 {
             core::hint::spin_loop();
             unsafe { nop() };
     }
