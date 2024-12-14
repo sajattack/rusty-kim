@@ -18,12 +18,15 @@ pub enum Error {
 }
 
 fn main() -> Result<(), Error> {
-    let mut port = serialport::new("/dev/ttyUSB0", 300).open().expect("Failed to open port");
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() != 2 {
-        return Err(Error::InvalidArgs)
-    }
-    run_on_serialport(port.as_mut(), &args[0], &args[1])
+    //let mut port = serialport::new("/dev/ttyUSB0", 300).open().expect("Failed to open port");
+    //let args: Vec<String> = std::env::args().collect();
+    //if args.len() != 2 {
+        //return Err(Error::InvalidArgs)
+    //}
+    //run_on_serialport(port.as_mut(), &args[0], &args[1])
+    let mut file = File::create("aoc2024d1p1.ptp").map_err(|e| Error::IoError(e))?;
+    file.write(convert_binary_file_to_papertape("../aoc2024d1p1/target/mos-unknown-none/release/rusty-kim.bin", 0x200)?.as_bytes()).map_err(|e| Error::IoError(e))?;
+    Ok(())
 }
 
 fn run_on_serialport<P: AsRef<Path>>(port: &mut dyn SerialPort, program_path: P, input_path: P) -> Result<(), Error>
@@ -76,7 +79,7 @@ fn convert_binary_file_to_papertape<P: AsRef<Path>>(file: P, start_address: u16)
 fn convert_binary_to_papertape(data: &[u8], start_address: u16) -> Result<String, Error> {
     let mut out = String::new();
     let record_length: u16 = 0x18;
-    for (i, data_slice) in data.windows(record_length as usize).enumerate() {
+    for (i, data_slice) in data.chunks(record_length as usize).enumerate() {
         let address = start_address + i as u16 * record_length;
         let address_string = format!("{:04X}", address);
         let address_bytes = address.to_be_bytes();
@@ -88,8 +91,13 @@ fn convert_binary_to_papertape(data: &[u8], start_address: u16) -> Result<String
             }
         record += format!("{:04X}", checksum).as_str();
         out += record.as_str();
-        out += "\r";
+        out += "\r\n";
     } 
+    let num_records = data.len() as u16 / record_length;
+    let record = format!(";00{:04x}{:04x}\x13", num_records, num_records); // the last one is actually the checksum but
+                                                                          // it's equal to the number of records in this
+                                                                          // case
+    out += record.as_str();
     Ok(out)
 }
 
