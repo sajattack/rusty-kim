@@ -1,6 +1,7 @@
 #![feature(trait_upcasting)]
 
 use std::fs::File;
+use std::num::ParseIntError;
 use std::path::Path;
 use std::io::Read;
 use std::io::Write;
@@ -14,25 +15,35 @@ pub enum Error {
     IoError(std::io::Error),
     SerialPortError(serialport::Error),
     Utf8Error(std::str::Utf8Error),
+    ParseIntError(ParseIntError),
     InvalidArgs,
 }
 
+#[repr(u8)]
+pub enum Command {
+    Space = 0x20, // switch from address to data after entering an address
+    CarriageReturnNext = 0x0D, // step to the next address
+    ConfirmData = 0x6D,
+    LFPrev = 0x0A, // step to the previous address
+    Execute = b'G',
+}
+
 fn main() -> Result<(), Error> {
-    //let mut port = serialport::new("/dev/ttyUSB0", 300).open().expect("Failed to open port");
-    //let args: Vec<String> = std::env::args().collect();
-    //if args.len() != 2 {
-        //return Err(Error::InvalidArgs)
-    //}
-    //run_on_serialport(port.as_mut(), &args[0], &args[1])
-    let mut file = File::create("aoc2024d1p1.ptp").map_err(|e| Error::IoError(e))?;
-    file.write(convert_binary_file_to_papertape("../aoc2024d1p1/target/mos-unknown-none/release/rusty-kim.bin", 0x200)?.as_bytes()).map_err(|e| Error::IoError(e))?;
+    let mut port = serialport::new("/dev/ttyUSB0", 300).open().expect("Failed to open port");
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() != 2 {
+        return Err(Error::InvalidArgs)
+    }
+    run_on_serialport(port.as_mut(), &args[0], &args[1])?;
+    //feed_inputs_from_file(port.as_mut(), "../aoc2024d1p1/test_input_not_mine.txt")?;
     Ok(())
 }
 
 fn run_on_serialport<P: AsRef<Path>>(port: &mut dyn SerialPort, program_path: P, input_path: P) -> Result<(), Error>
 {
     load_bin_file_as_papertape(port, program_path.as_ref(), 0x200)?;
-    feed_inputs_from_file(port, input_path.as_ref())
+    feed_inputs_from_file(port, input_path.as_ref())?;
+    Ok(())
 }
 
 fn run_on_emulator() -> Result<(), Error> {
@@ -101,6 +112,33 @@ fn convert_binary_to_papertape(data: &[u8], start_address: u16) -> Result<String
     Ok(out)
 }
 
-fn feed_inputs_from_file<P: AsRef<Path>>(port: &mut dyn Write, file: P) -> Result<(), Error> {
-    todo!()
+fn feed_inputs_from_file<P: AsRef<Path>>(port: &mut dyn Write, path: P) -> Result<(), Error> {
+    // parse the file ✅
+    // feed the data as 32bit pairs
+    // execute the subroutine for every pair
+    let mut file = File::open(path.as_ref()).map_err(|e| Error::IoError(e))?;
+    let mut data = String::new();
+    file.read_to_string(&mut data).map_err(|e| Error::IoError(e))?;
+    let pairs: Result<Vec<Vec<u32>>, Error> = data
+        .lines()
+        .map(|l| l.split_whitespace()
+            .map(|s| s.parse::<u32>().map_err(|e| Error::ParseIntError(e)))
+            .collect()
+        ).collect();
+    //println!("{:?}", pairs?);
+
+    for pair in pairs?.iter() {
+        port.write(b"0020 ").map_err(|e| Error::IoError(e))?;
+        for value in pair {
+            for byte in value.to_be_bytes().into_iter() {
+                let hex_str = format!("{:02x}", byte);
+                port.write(hex_str.as_bytes()).map_err(|e| Error::IoError(e))?;
+                port.write(&[Command::ConfirmData as u8]).map_err(|e| Error::IoError(e))?;
+                port.write(&[Command::CarriageReturnNext as u8]).map_err(|e| Error::IoError(e))?;
+            }
+        }
+        port.write(b"0204G").map_err(|e| Error::IoError(e))?;
+    };
+
+    Ok(())
 }
