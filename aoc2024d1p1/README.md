@@ -12,7 +12,7 @@ objcopy -I elf32-little target/mos-unknown-none/release/rusty-kim -O binary targ
 
 Load the binary at 0x200 and press GO
 
-The program will print 3 addresses.
+The program will display 3 addresses. It will wait for any keypress between each address
 
 Ex:
 ```

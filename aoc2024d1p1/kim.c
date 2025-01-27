@@ -1,17 +1,39 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
+
+void scandisplay_slow(unsigned char a, unsigned char b, unsigned char c) {
+    asm volatile(
+       "ST%0     0xFB\n"
+       "ST%1     0xFA\n"
+       "ST%2     0xF9\n"
+        "ldy #$10\n"
+        "delay_loop1: ldx #$ff\n"
+        "delay_loop2: jsr      0x1F1F\n" //; SCANDS kernal fn
+        "dex\n"
+        "bne delay_loop2\n"
+        "dey\n"
+        "bne delay_loop1\n"
+
+        : 
+        : "R"(a), "R"(b), "R"(c)
+        : "memory"
+    );
+}
 
 void scandisplay(unsigned char a, unsigned char b, unsigned char c) {
     asm volatile(
        "ST%0     0xFB\n"
        "ST%1     0xFA\n"
        "ST%2     0xF9\n"
-       "JMP      0x1F1F" //; SCANDS kernal fn
+       "jsr      0x1F1F" //; SCANDS kernal fn
         : 
         : "R"(a), "R"(b), "R"(c)
         : "memory"
     );
 }
+
+
 
 void cleardisplay()
 {
@@ -37,7 +59,7 @@ void brk() {
 
 void delay() {
     asm volatile(
-        "ldy #$10\n"
+        "ldy #$ff\n"
         "loop1: ldx #$ff\n"
         "loop2: nop\n"
         "dex\n"
@@ -48,7 +70,13 @@ void delay() {
         :
         :"x", "y"
     );
+}
 
+void start() {
+    asm volatile(
+        "jmp 0x1c4f\n" // START
+        :::
+    );
 }
 
 char getkey() {
@@ -61,6 +89,17 @@ char getkey() {
         :
     );
     return out;
+}
+
+bool ak() {
+    char out;
+    asm volatile(
+        "JSR 0x1EFE\n"
+        : "=a" (out)
+        :
+        :
+    );
+    return (out != 0);
 }
 
 void __chrout(char c) {
